@@ -1,0 +1,41 @@
+# code: language=yaml
+#
+# Helm release for opentelemetry-operator
+#
+
+{{- $otel := $state.opentelemetryOperator }}
+
+---
+apiVersion: helm.m.crossplane.io/v1beta1
+kind: Release
+metadata:
+  name: {{ $otel.releaseName }}
+  annotations:
+    {{ setResourceNameAnnotation "helm-release-opentelemetry-operator" }}
+  labels: {{ $otel.labels | toJson }}
+spec:
+  managementPolicies: {{ $otel.managementPolicies | toJson }}
+  forProvider:
+    chart:
+      name: opentelemetry-operator
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.77.0
+    namespace: {{ $otel.namespace }}
+    {{- if $otel.overrideAllValues }}
+    values:
+      {{- toYaml $otel.overrideAllValues | nindent 6 }}
+    {{- else }}
+    values:
+      fullnameOverride: opentelemetry-operator
+      nameOverride: opentelemetry-operator
+      manager:
+        collectorImage:
+          repository: otel/opentelemetry-collector-contrib
+      {{- if $otel.values }}
+      {{- toYaml $otel.values | nindent 6 }}
+      {{- end }}
+    {{- end }}
+  rollbackLimit: 3
+  providerConfigRef:
+    name: {{ $otel.providerConfigRef.name }}
+    kind: {{ $otel.providerConfigRef.kind }}
