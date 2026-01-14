@@ -1,3 +1,4 @@
+import models.ai.com.ops.hops.helm.v1alpha1 as helmv1alpha1
 import models.io.upbound.dev.meta.v1alpha1 as metav1alpha1
 import models.k8s.apimachinery.pkg.apis.meta.v1 as metav1
 
@@ -20,13 +21,9 @@ _items = [
             xrdPath = "apis/opentelemetryoperators/definition.yaml"
             timeoutSeconds = 60
             validate = False
-            xr = {
-                apiVersion = "helm.hops.ops.com.ai/v1alpha1"
-                kind = "OpenTelemetryOperator"
+            xr = helmv1alpha1.OpenTelemetryOperator {
                 metadata.name = "test-otel-operator"
-                spec = {
-                    clusterName = "test-cluster"
-                }
+                spec.clusterName = "test-cluster"
             }
             assertResources = [
                 {
@@ -48,16 +45,12 @@ _items = [
             xrdPath = "apis/opentelemetryoperators/definition.yaml"
             timeoutSeconds = 60
             validate = False
-            xr = {
-                apiVersion = "helm.hops.ops.com.ai/v1alpha1"
-                kind = "OpenTelemetryOperator"
+            xr = helmv1alpha1.OpenTelemetryOperator {
                 metadata.name = "labeled-otel-operator"
                 spec = {
                     clusterName = "test-cluster"
-                    labels = {
-                        team = "platform"
-                        environment = "staging"
-                    }
+                    # labels uses x-kubernetes-preserve-unknown-fields, use untyped
+                    labels = {team = "platform", environment = "staging"}
                 }
             }
             assertResources = [
@@ -88,16 +81,11 @@ _items = [
             xrdPath = "apis/opentelemetryoperators/definition.yaml"
             timeoutSeconds = 60
             validate = False
-            xr = {
-                apiVersion = "helm.hops.ops.com.ai/v1alpha1"
-                kind = "OpenTelemetryOperator"
+            xr = helmv1alpha1.OpenTelemetryOperator {
                 metadata.name = "override-test"
                 spec = {
                     clusterName = "my-cluster"
-                    overrideAllValues = {
-                        fullnameOverride = "custom-otel-operator"
-                        manager.enabled = False
-                    }
+                    overrideAllValues = {fullnameOverride = "custom-otel-operator", manager = {enabled = False}}
                 }
             }
             assertResources = [
@@ -107,7 +95,7 @@ _items = [
                     metadata.name = "override-test"
                     spec.forProvider.values = {
                         fullnameOverride = "custom-otel-operator"
-                        manager.enabled = False
+                        manager = {enabled = False}
                     }
                 }
             ]
