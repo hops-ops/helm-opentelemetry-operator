@@ -27,6 +27,22 @@ _items = [
             skipDelete = False
 
             # ==============================================================
+            # initResources: Configuration packages installed first
+            # These are NOT deleted during cleanup
+            # ==============================================================
+            initResources = [
+                # cert-manager Configuration - required by OpenTelemetry Operator
+                {
+                    apiVersion = "pkg.crossplane.io/v1"
+                    kind = "Configuration"
+                    metadata.name = "helm-cert-manager"
+                    spec = {
+                        package = "ghcr.io/hops-ops/helm-cert-manager:v0.6.1"
+                    }
+                }
+            ]
+
+            # ==============================================================
             # extraResources: RBAC and Helm ProviderConfig
             # These are NOT deleted during cleanup
             # ==============================================================
@@ -68,10 +84,26 @@ _items = [
             ]
 
             # ==============================================================
-            # manifests: The OpenTelemetryOperator XR to test
+            # manifests: CertManager and OpenTelemetryOperator XRs to test
             # Resources here ARE deleted during cleanup
             # ==============================================================
             manifests = [
+                # CertManager must be installed before OpenTelemetry Operator
+                {
+                    apiVersion = "helm.hops.ops.com.ai/v1alpha1"
+                    kind = "CertManager"
+                    metadata = {
+                        name = "cert-manager"
+                        namespace = "default"
+                    }
+                    spec = {
+                        clusterName = "cert-manager"
+                        providerConfigRef = {
+                            name = "default"
+                            kind = "ProviderConfig"
+                        }
+                    }
+                }
                 helmv1alpha1.OpenTelemetryOperator {
                     metadata = {
                         name = _test_name
