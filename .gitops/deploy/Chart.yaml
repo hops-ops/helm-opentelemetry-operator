@@ -2,4 +2,4 @@ apiVersion: v2
 name: helm-opentelemetry-operator
 version: 0.0.0
 description: GitOps packaging for the opentelemetry-operator Crossplane configuration
-appVersion: 0.102.0
+appVersion: 0.105.0
