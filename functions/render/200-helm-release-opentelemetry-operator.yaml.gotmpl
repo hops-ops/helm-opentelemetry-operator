@@ -26,8 +26,6 @@ spec:
       {{- toYaml $otel.overrideAllValues | nindent 6 }}
     {{- else }}
     values:
-      fullnameOverride: opentelemetry-operator
-      nameOverride: opentelemetry-operator
       manager:
         collectorImage:
           repository: otel/opentelemetry-collector-contrib
